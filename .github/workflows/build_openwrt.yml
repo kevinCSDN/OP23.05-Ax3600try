@@ -11,13 +11,9 @@
 name: Build OpenWrt
 
 on:
-  repository_dispatch:
-  workflow_dispatch:
-    inputs:
-      ssh:
-        description: 'SSH connection to Actions'
-        required: false
-        default: 'false'
+  push:
+    branches:
+      - main  # 你可以根据需要修改触发的分支
 
 env:
   REPO_URL: https://github.com/immortalwrt/immortalwrt
@@ -38,6 +34,16 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
+    - name: Cache dependencies
+      uses: actions/cache@v2
+      with:
+        path: |
+          /workdir/openwrt/build_dir
+          /workdir/openwrt/staging_dir
+        key: ${{ runner.os }}-build-${{ hashFiles('**/*.config') }}
+        restore-keys: |
+          ${{ runner.os }}-build-
+
     - name: Checkout
       uses: actions/checkout@main
 
@@ -60,6 +66,7 @@ jobs:
         df -hT $PWD
         git clone $REPO_URL -b $REPO_BRANCH openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
+
 
     - name: Load custom feeds
       run: |
