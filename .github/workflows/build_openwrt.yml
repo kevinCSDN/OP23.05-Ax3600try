@@ -34,16 +34,6 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-    - name: Cache dependencies
-      uses: actions/cache@v2
-      with:
-        path: |
-          /workdir/openwrt/build_dir
-          /workdir/openwrt/staging_dir
-        key: ${{ runner.os }}-build-${{ hashFiles('**/*.config') }}
-        restore-keys: |
-          ${{ runner.os }}-build-
-
     - name: Checkout
       uses: actions/checkout@main
 
@@ -59,6 +49,16 @@ jobs:
         sudo timedatectl set-timezone "$TZ"
         sudo mkdir -p /workdir
         sudo chown $USER:$GROUPS /workdir
+        
+    - name: Cache dependencies
+      uses: actions/cache@v2
+      with:
+        path: |
+          /workdir/openwrt/build_dir
+          /workdir/openwrt/staging_dir
+        key: ${{ runner.os }}-build-${{ hashFiles('**/*.config') }}
+        restore-keys: |
+          ${{ runner.os }}-build-
 
     - name: Clone source code
       working-directory: /workdir
